@@ -1,0 +1,22 @@
+# Lokal PostgreSQL (dev + test uchun bitta server, ikkita alohida baza).
+# Port 5434 - boshqa loyihalar bilan to'qnashmaslik uchun.
+services:
+  postgres:
+    image: postgres:16
+    container_name: teamflow-postgres
+    environment:
+      POSTGRES_USER: teamflow
+      POSTGRES_PASSWORD: teamflow_local_pw
+      POSTGRES_DB: teamflow_dev
+    ports:
+      - '127.0.0.1:5434:5432'
+    volumes:
+      - teamflow_pgdata:/var/lib/postgresql/data
+      - ./docker/init-databases.sql:/docker-entrypoint-initdb.d/init-databases.sql:ro
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U teamflow -d teamflow_dev']
+      interval: 3s
+      timeout: 3s
+      retries: 20
+volumes:
+  teamflow_pgdata:
